@@ -1,0 +1,87 @@
+version: '3.8'
+services:
+  api:
+    build:
+      dockerfile: Dockerfile
+      context: .
+      # Only will build development stage from our dockerfile
+      target: development
+    volumes:
+      - .:/usr/mks-backend-challenge
+      - node_modules:/usr/mks-backend-challenge/node_modules
+    restart: always
+    env_file:
+      - local.env
+    # Run a command against the development stage of the image
+    command: yarn start:dev
+    ports:
+      - 3000:3000
+    depends_on:
+      - redis
+      - postgres
+      - pgadmin
+    environment:
+      - JWT_SECRET=${JWT_SECRET}
+      - JWT_EXPIRATION_TIME=${JWT_EXPIRATION_TIME}
+      - ENVIRONMENT=${ENVIRONMENT}
+      - DATABASE_TYPE=${DATABASE_TYPE}
+      - DATABASE_HOST=${DATABASE_HOST}
+      - DATABASE_PORT=${DATABASE_PORT}
+      - DATABASE_TYPE=${DATABASE_TYPE}
+      - DATABASE_USER=${DATABASE_USER}
+      - DATABASE_PASSWORD=${DATABASE_PASSWORD}
+      - DATABASE_NAME=${DATABASE_NAME}
+      - DATABASE_SYNCHRONIZE=${DATABASE_SYNCHRONIZE}
+      - REDIS_HOST=${REDIS_HOST}
+      - REDIS_PORT=${REDIS_PORT}
+      - AWS_S3_BUCKET=${REDIS_PORT}
+      - DEFAULT_REGION=${DEFAULT_REGION}
+      - DEFAULT_FILES_ACL=${DEFAULT_FILES_ACL}
+      - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
+      - AWS_SECRET_ACCESS=${AWS_SECRET_ACCESS}
+      - NODE_TLS_REJECT_UNAUTHORIZED=${NODE_TLS_REJECT_UNAUTHORIZED}
+      - PORT=3000
+    networks:
+      - postgres
+  redis: # Name of container
+    image: redis
+    ports:
+      - 6379:6379
+    volumes:
+      - redis:/data
+  postgres:
+    container_name: postgres
+    image: postgres:latest
+    ports:
+      - '5432:5432'
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    volumes:
+      - /data/postgres:/data/postgres
+    networks:
+      - postgres
+  pgadmin:
+    links:
+      - postgres:postgres
+    container_name: pgadmin
+    depends_on:
+      - postgres
+    image: dpage/pgadmin4
+    ports:
+      - '8081:80'
+    volumes:
+      - /data/pgadmin:/root/.pgadmin
+    environment:
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL}
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD}
+    networks:
+      - postgres
+volumes:
+  redis:
+    driver: local
+
+networks:
+  postgres:
+    driver: bridge
