@@ -1,5 +1,3 @@
-import { RepositoriesModule } from './../../repositories/repositories.module';
-import { User } from './../../../domain/entities/user.entity';
 import { DynamicModule, Module } from '@nestjs/common';
 import {
   CreateUserUseCase,
@@ -12,9 +10,8 @@ import { UseCaseProxy } from '../usecase-proxy';
 import { EnvironmentConfigModule } from './../../config/environment-config/environment-config.module';
 import { LoggerModule } from './../../logger/logger.module';
 import { LoggerService } from './../../logger/logger.service';
+import { RepositoriesModule } from './../../repositories/repositories.module';
 import { DatabaseUserRepository } from './../../repositories/user.repository';
-import { TypeOrmModule } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
 
 @Module({
   imports: [LoggerModule, EnvironmentConfigModule, RepositoriesModule],
@@ -34,7 +31,7 @@ export class UserUsecasesProxyModule {
           inject: [DatabaseUserRepository],
           provide: UserUsecasesProxyModule.GET_USER_USECASES_PROXY,
           useFactory: (repository: DatabaseUserRepository) =>
-            new UseCaseProxy(new FindAllUserUseCase(repository)),
+            new UseCaseProxy(new FindOneUserUseCase(repository)),
         },
         {
           inject: [DatabaseUserRepository],

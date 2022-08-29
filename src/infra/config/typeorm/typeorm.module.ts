@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { All, Module } from '@nestjs/common';
 import { TypeOrmModule, TypeOrmModuleOptions } from '@nestjs/typeorm';
 import { EnvironmentConfigModule } from '../environment-config/environment-config.module';
 import { EnvironmentConfigService } from '../environment-config/environment-config.service';
@@ -16,6 +16,7 @@ export const getTypeOrmModuleOptions = (
     entities: ['dist/**/*.entity{.ts,.js}'],
     synchronize: true, //config.getDatabaseSync(),
     ssl: config.getEnvironment() === 'production',
+    logging: config.getEnvironment() === 'development',
     extra:
       process.env.ENVIRONMENT === 'production'
         ? {

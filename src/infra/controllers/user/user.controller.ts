@@ -38,8 +38,8 @@ export class UserController {
     return users.map((user) => new UserPresenter(user));
   }
 
-  @GetApiResponse(UserPresenter, '/:id')
-  public async findOne(@Param() id: string): Promise<UserPresenter> {
+  @GetApiResponse(UserPresenter, ':id')
+  public async findOne(@Param('id') id: string): Promise<UserPresenter> {
     return await this.findOneUserUseCase.getInstance().execute(id);
   }
 
@@ -54,15 +54,15 @@ export class UserController {
 
   @PutApiResponse(UserPresenter, '/:id')
   public async update(
-    @Param() id: string,
+    @Param('id') id: string,
     @Body() user: UpdateUserDTO,
   ): Promise<UserPresenter> {
     return await this.updateUserUseCase.getInstance().execute(id, user);
   }
 
   @HttpCode(204)
-  @DeleteApiResponse()
-  public async delete(@Param() id: string): Promise<void> {
+  @DeleteApiResponse('/:id')
+  public async delete(@Param('id') id: string): Promise<void> {
     return await this.deleteUserUseCase.getInstance().execute(id);
   }
 }
