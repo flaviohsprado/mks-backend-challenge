@@ -1,12 +1,12 @@
 import { CreateUserDTO } from './../../../infra/controllers/user/user.dto';
 import { User } from './../../entities/user.entity';
 import { ILogger } from './../../logger/logger.interface';
-import { UserRepository } from './../../repositories/user.repository';
+import { IUserRepository } from './../../repositories/user.repository';
 
 export class CreateUserUseCase {
   constructor(
     private readonly logger: ILogger,
-    private readonly repository: UserRepository,
+    private readonly repository: IUserRepository,
   ) {}
 
   public async execute(user: CreateUserDTO): Promise<User> {

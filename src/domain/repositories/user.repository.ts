@@ -4,7 +4,7 @@ import {
   UpdateUserDTO,
 } from './../../infra/controllers/user/user.dto';
 
-export interface UserRepository {
+export interface IUserRepository {
   findAll(): Promise<User[]>;
   findOne(id: string): Promise<User>;
   create(user: CreateUserDTO): Promise<User>;

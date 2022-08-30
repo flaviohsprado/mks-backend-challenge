@@ -11,7 +11,7 @@ import {
   FindOneUserUseCase,
   UpdateUserUseCase,
 } from './../../../domain/use-cases/user/index';
-import { UserUsecasesProxyModule } from './../../usecases-proxy/user/usecases-proxy.module';
+import { UserUsecasesProxyModule } from '../../usecases-proxy/user/user-usecases-proxy.module';
 import { CreateUserDTO, UpdateUserDTO } from './user.dto';
 import { UserPresenter } from './user.presenter';
 import { ApiTags } from '@nestjs/swagger';
