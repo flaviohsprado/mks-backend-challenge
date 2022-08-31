@@ -9,6 +9,7 @@ export class DatabaseUserRepository implements IUserRepository {
   constructor(
     @InjectRepository(User)
     private readonly userEntityRepository: Repository<User>,
+    private readonly exceptionService: ExceptionsService,
   ) {}
 
   public async findAll(): Promise<User[]> {
@@ -21,6 +22,17 @@ export class DatabaseUserRepository implements IUserRepository {
     });
 
     if (!user) throw new NotFoundException(`User with id ${id} not found`);
+
+    return user;
+  }
+
+  public async findByKey(key: string, value: string): Promise<User> {
+    const user = await this.userEntityRepository.findOne({
+      where: { [key]: value },
+      relations: ['role', 'file'],
+    });
+
+    if (!user) throw new StandardError(404, 'User not found');
 
     return user;
   }

@@ -1,3 +1,4 @@
+import { IBcryptService } from './../../interfaces/bcrypt.interface';
 import { CreateUserDTO } from './../../../infra/controllers/user/user.dto';
 import { User } from './../../entities/user.entity';
 import { ILogger } from './../../logger/logger.interface';
@@ -7,9 +8,12 @@ export class CreateUserUseCase {
   constructor(
     private readonly logger: ILogger,
     private readonly repository: IUserRepository,
+    private readonly bcryptService: IBcryptService,
   ) {}
 
   public async execute(user: CreateUserDTO): Promise<User> {
+    user.password = await this.bcryptService.hash(user.password);
+
     const createdUser = await this.repository.create(user);
 
     this.logger.log(

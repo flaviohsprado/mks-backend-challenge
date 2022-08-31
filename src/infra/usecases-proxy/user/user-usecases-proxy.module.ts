@@ -1,3 +1,5 @@
+import { BcryptService } from './../../services/bcrypt/bcrypt.service';
+import { BcryptModule } from './../../services/bcrypt/bcrypt.module';
 import { DynamicModule, Module } from '@nestjs/common';
 import {
   CreateUserUseCase,
@@ -14,7 +16,12 @@ import { RepositoriesModule } from '../../repositories/repositories.module';
 import { DatabaseUserRepository } from '../../repositories/user.repository';
 
 @Module({
-  imports: [LoggerModule, EnvironmentConfigModule, RepositoriesModule],
+  imports: [
+    LoggerModule,
+    EnvironmentConfigModule,
+    RepositoriesModule,
+    BcryptModule,
+  ],
 })
 export class UserUsecasesProxyModule {
   static GET_USER_USECASES_PROXY = 'getUserUsecasesProxy';
@@ -40,12 +47,16 @@ export class UserUsecasesProxyModule {
             new UseCaseProxy(new FindAllUserUseCase(repository)),
         },
         {
-          inject: [LoggerService, DatabaseUserRepository],
+          inject: [LoggerService, DatabaseUserRepository, BcryptService],
           provide: UserUsecasesProxyModule.POST_USER_USECASES_PROXY,
           useFactory: (
             logger: LoggerService,
             repository: DatabaseUserRepository,
-          ) => new UseCaseProxy(new CreateUserUseCase(logger, repository)),
+            bcryptService: BcryptService,
+          ) =>
+            new UseCaseProxy(
+              new CreateUserUseCase(logger, repository, bcryptService),
+            ),
         },
         {
           inject: [LoggerService, DatabaseUserRepository],
@@ -53,7 +64,11 @@ export class UserUsecasesProxyModule {
           useFactory: (
             logger: LoggerService,
             repository: DatabaseUserRepository,
-          ) => new UseCaseProxy(new UpdateUserUseCase(logger, repository)),
+            bcryptService: BcryptService,
+          ) =>
+            new UseCaseProxy(
+              new UpdateUserUseCase(logger, repository, bcryptService),
+            ),
         },
         {
           inject: [LoggerService, DatabaseUserRepository],

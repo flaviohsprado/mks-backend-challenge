@@ -1,17 +1,11 @@
+import { LoginUseCase } from './../../../domain/use-cases/auth/login.usecase';
 import { DynamicModule, Module } from '@nestjs/common';
-import {
-  CreateUserUseCase,
-  DeleteUserUseCase,
-  FindAllUserUseCase,
-  FindOneUserUseCase,
-  UpdateUserUseCase,
-} from '../../../domain/use-cases/user/index';
 import { UseCaseProxy } from '../usecase-proxy';
 import { EnvironmentConfigModule } from '../../config/environment-config/environment-config.module';
 import { LoggerModule } from '../../logger/logger.module';
 import { LoggerService } from '../../logger/logger.service';
 import { RepositoriesModule } from '../../repositories/repositories.module';
-import { DatabaseUserRepository } from '../../repositories/user.repository';
+import { DatabaseAuthRepository } from '../../repositories/auth.repository';
 
 @Module({
   imports: [LoggerModule, EnvironmentConfigModule, RepositoriesModule],
@@ -24,10 +18,12 @@ export class AuthUsecasesProxyModule {
       module: AuthUsecasesProxyModule,
       providers: [
         {
-          inject: [DatabaseUserRepository],
+          inject: [LoggerService, DatabaseAuthRepository],
           provide: AuthUsecasesProxyModule.LOGIN_USECASES_PROXY,
-          useFactory: (repository: DatabaseUserRepository) =>
-            new UseCaseProxy(new FindOneUserUseCase(repository)),
+          useFactory: (
+            logger: LoggerService,
+            repository: DatabaseAuthRepository,
+          ) => new UseCaseProxy(new LoginUseCase(logger, repository)),
         },
       ],
       exports: [AuthUsecasesProxyModule.LOGIN_USECASES_PROXY],
