@@ -3,10 +3,10 @@ export interface IFormatExceptionMessage {
   statusCode?: number;
 }
 
-export interface IException {
-  BadRequestException(data: IFormatExceptionMessage): void;
-  InternalServerErrorException(data?: IFormatExceptionMessage): void;
-  ForbiddenException(data?: IFormatExceptionMessage): void;
-  UnauthorizedException(data?: IFormatExceptionMessage): void;
-  NotFoundException(data?: IFormatExceptionMessage): void;
+export interface IExceptionService {
+  throwBadRequestException(data: IFormatExceptionMessage): void;
+  throwInternalServerErrorException(data?: IFormatExceptionMessage): void;
+  throwForbiddenException(data?: IFormatExceptionMessage): void;
+  throwUnauthorizedException(data?: IFormatExceptionMessage): void;
+  throwNotFoundException(data?: IFormatExceptionMessage): void;
 }

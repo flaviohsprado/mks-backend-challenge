@@ -4,6 +4,7 @@ import { DynamicModule, Module } from '@nestjs/common';
 import {
   CreateUserUseCase,
   DeleteUserUseCase,
+  FindUserByKeyUseCase,
   FindAllUserUseCase,
   FindOneUserUseCase,
   UpdateUserUseCase,
@@ -14,6 +15,8 @@ import { LoggerModule } from '../../logger/logger.module';
 import { LoggerService } from '../../logger/logger.service';
 import { RepositoriesModule } from '../../repositories/repositories.module';
 import { DatabaseUserRepository } from '../../repositories/user.repository';
+import { ExceptionsModule } from '../../exceptions/exceptions.module';
+import { ExceptionsService } from '../../exceptions/exceptions.service';
 
 @Module({
   imports: [
@@ -21,11 +24,13 @@ import { DatabaseUserRepository } from '../../repositories/user.repository';
     EnvironmentConfigModule,
     RepositoriesModule,
     BcryptModule,
+    ExceptionsModule,
   ],
 })
 export class UserUsecasesProxyModule {
   static GET_USER_USECASES_PROXY = 'getUserUsecasesProxy';
   static GET_USERS_USECASES_PROXY = 'getUsersUsecasesProxy';
+  static FIND_USER_BY_KEY_USECASES_PROXY = 'findUserByKeyUsecasesProxy';
   static POST_USER_USECASES_PROXY = 'postUserUsecasesProxy';
   static DELETE_USER_USECASES_PROXY = 'deleteUserUsecasesProxy';
   static PUT_USER_USECASES_PROXY = 'putUserUsecasesProxy';
@@ -36,15 +41,31 @@ export class UserUsecasesProxyModule {
       providers: [
         {
           inject: [DatabaseUserRepository],
-          provide: UserUsecasesProxyModule.GET_USER_USECASES_PROXY,
-          useFactory: (repository: DatabaseUserRepository) =>
-            new UseCaseProxy(new FindOneUserUseCase(repository)),
-        },
-        {
-          inject: [DatabaseUserRepository],
           provide: UserUsecasesProxyModule.GET_USERS_USECASES_PROXY,
           useFactory: (repository: DatabaseUserRepository) =>
             new UseCaseProxy(new FindAllUserUseCase(repository)),
+        },
+        {
+          inject: [DatabaseUserRepository],
+          provide: UserUsecasesProxyModule.GET_USER_USECASES_PROXY,
+          useFactory: (
+            repository: DatabaseUserRepository,
+            exceptionService: ExceptionsService,
+          ) =>
+            new UseCaseProxy(
+              new FindOneUserUseCase(repository, exceptionService),
+            ),
+        },
+        {
+          inject: [DatabaseUserRepository],
+          provide: UserUsecasesProxyModule.FIND_USER_BY_KEY_USECASES_PROXY,
+          useFactory: (
+            repository: DatabaseUserRepository,
+            exceptionService: ExceptionsService,
+          ) =>
+            new UseCaseProxy(
+              new FindUserByKeyUseCase(repository, exceptionService),
+            ),
         },
         {
           inject: [LoggerService, DatabaseUserRepository, BcryptService],
@@ -80,8 +101,9 @@ export class UserUsecasesProxyModule {
         },
       ],
       exports: [
-        UserUsecasesProxyModule.GET_USER_USECASES_PROXY,
         UserUsecasesProxyModule.GET_USERS_USECASES_PROXY,
+        UserUsecasesProxyModule.GET_USER_USECASES_PROXY,
+        UserUsecasesProxyModule.FIND_USER_BY_KEY_USECASES_PROXY,
         UserUsecasesProxyModule.POST_USER_USECASES_PROXY,
         UserUsecasesProxyModule.PUT_USER_USECASES_PROXY,
         UserUsecasesProxyModule.DELETE_USER_USECASES_PROXY,

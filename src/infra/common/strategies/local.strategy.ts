@@ -28,7 +28,7 @@ export class LocalStrategy extends PassportStrategy(Strategy) {
         'LocalStrategy',
         `Username or password is missing, BadRequestException`,
       );
-      this.exceptionService.UnauthorizedException();
+      this.exceptionService.throwUnauthorizedException();
     }
 
     const user = await this.loginUsecaseProxy
@@ -38,7 +38,7 @@ export class LocalStrategy extends PassportStrategy(Strategy) {
     if (!user) {
       this.logger.warn('LocalStrategy', `Invalid username or password`);
 
-      this.exceptionService.UnauthorizedException({
+      this.exceptionService.throwUnauthorizedException({
         message: 'Invalid username or password.',
       });
     }

@@ -2,6 +2,7 @@ import { UpdateUserDTO } from './../../../infra/controllers/user/user.dto';
 import { User } from './../../entities/user.entity';
 import { ILogger } from './../../logger/logger.interface';
 import { IUserRepository } from './../../repositories/user.repository';
+import { IBcryptService } from './../../interfaces/bcrypt.interface';
 
 export class UpdateUserUseCase {
   constructor(
@@ -12,7 +13,7 @@ export class UpdateUserUseCase {
 
   public async execute(id: string, user: UpdateUserDTO): Promise<User> {
     if (user.password)
-      user.password = await this.bcryptService.hash(user.password);
+      user.password = await this.bcryptService.createHash(user.password);
 
     const updatedUser = await this.repository.update(id, user);
 

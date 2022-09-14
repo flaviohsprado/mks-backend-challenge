@@ -12,7 +12,7 @@ export class CreateUserUseCase {
   ) {}
 
   public async execute(user: CreateUserDTO): Promise<User> {
-    user.password = await this.bcryptService.hash(user.password);
+    user.password = await this.bcryptService.createHash(user.password);
 
     const createdUser = await this.repository.create(user);
 

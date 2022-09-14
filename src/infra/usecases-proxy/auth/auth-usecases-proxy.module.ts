@@ -6,6 +6,9 @@ import { LoggerModule } from '../../logger/logger.module';
 import { LoggerService } from '../../logger/logger.service';
 import { RepositoriesModule } from '../../repositories/repositories.module';
 import { DatabaseAuthRepository } from '../../repositories/auth.repository';
+import { IUserRepository } from '../../repositories/user.repository';
+import { IBcryptService } from '../../interfaces/bcrypt.interface';
+import { IJwtService } from '../../interfaces/jwt.interface';
 
 @Module({
   imports: [LoggerModule, EnvironmentConfigModule, RepositoriesModule],
@@ -18,12 +21,27 @@ export class AuthUsecasesProxyModule {
       module: AuthUsecasesProxyModule,
       providers: [
         {
-          inject: [LoggerService, DatabaseAuthRepository],
+          inject: [
+            LoggerService,
+            DatabaseAuthRepository,
+            userRepository,
+            jwtService,
+            bcryptService,
+          ],
           provide: AuthUsecasesProxyModule.LOGIN_USECASES_PROXY,
           useFactory: (
             logger: LoggerService,
             repository: DatabaseAuthRepository,
-          ) => new UseCaseProxy(new LoginUseCase(logger, repository)),
+            userRepository: IUserRepository,
+            jwtService: IJwtService,
+            bcryptService: IBcryptService,
+          ) =>
+            new UseCaseProxy(
+              new LoginUseCase(
+                logger,
+                new repository(userRepository, jwtService, bcryptService),
+              ),
+            ),
         },
       ],
       exports: [AuthUsecasesProxyModule.LOGIN_USECASES_PROXY],
