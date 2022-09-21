@@ -26,7 +26,7 @@ export class LoginUseCase {
       username: userValidated.username,
     });
 
-    this.logger.log(`LoginUseCases execute()`, `User have been logged in`);
+    this.logger.log(`LoginUseCases execute()`, `User have been logged in!`);
 
     return new AuthPresenter({ accessToken });
   }
