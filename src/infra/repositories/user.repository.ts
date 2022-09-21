@@ -1,8 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { User } from './../../domain/entities/user.entity';
-import { IUserRepository } from './../../domain/repositories/user.repository';
+import { User } from '../../domain/entities/user.entity';
+import { IUserRepository } from '../../domain/repositories/user.repository';
 
 @Injectable()
 export class DatabaseUserRepository implements IUserRepository {
@@ -22,7 +22,6 @@ export class DatabaseUserRepository implements IUserRepository {
   public async findByKey(key: string, value: string): Promise<User> {
     return await this.userEntityRepository.findOne({
       where: { [key]: value },
-      relations: ['role', 'file'],
     });
   }
 
@@ -36,7 +35,7 @@ export class DatabaseUserRepository implements IUserRepository {
   }
 
   public async delete(id: string): Promise<void> {
-    this.userEntityRepository.delete(id);
+    await this.userEntityRepository.delete(id);
     return;
   }
 }

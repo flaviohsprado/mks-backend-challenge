@@ -1,14 +1,14 @@
-import { BcryptService } from './../../services/bcrypt/bcrypt.service';
-import { BcryptModule } from './../../services/bcrypt/bcrypt.module';
+import { BcryptService } from '../../services/bcrypt/bcrypt.service';
+import { BcryptModule } from '../../services/bcrypt/bcrypt.module';
 import { DynamicModule, Module } from '@nestjs/common';
 import {
   CreateUserUseCase,
   DeleteUserUseCase,
-  FindUserByKeyUseCase,
   FindAllUserUseCase,
   FindOneUserUseCase,
+  FindUserByKeyUseCase,
   UpdateUserUseCase,
-} from '../../../domain/use-cases/user/index';
+} from '../../../domain/use-cases/user';
 import { UseCaseProxy } from '../usecase-proxy';
 import { EnvironmentConfigModule } from '../../config/environment-config/environment-config.module';
 import { LoggerModule } from '../../logger/logger.module';
@@ -80,7 +80,7 @@ export class UserUsecasesProxyModule {
             ),
         },
         {
-          inject: [LoggerService, DatabaseUserRepository],
+          inject: [LoggerService, DatabaseUserRepository, BcryptService],
           provide: UserUsecasesProxyModule.PUT_USER_USECASES_PROXY,
           useFactory: (
             logger: LoggerService,
