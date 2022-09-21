@@ -1,11 +1,11 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { User } from './../../domain/entities/user.entity';
-import { UserRepository } from './../../domain/repositories/user.repository';
+import { User } from '../../domain/entities/user.entity';
+import { IUserRepository } from '../../domain/repositories/user.repository';
 
 @Injectable()
-export class DatabaseUserRepository implements UserRepository {
+export class DatabaseUserRepository implements IUserRepository {
   constructor(
     @InjectRepository(User)
     private readonly userEntityRepository: Repository<User>,
@@ -16,14 +16,13 @@ export class DatabaseUserRepository implements UserRepository {
   }
 
   public async findOne(id: string): Promise<User> {
-    console.log('UUID: ', id);
-    const user = await this.userEntityRepository.findOne({
-      where: { id },
+    return await this.userEntityRepository.findOne({ where: { id } });
+  }
+
+  public async findByKey(key: string, value: string): Promise<User> {
+    return await this.userEntityRepository.findOne({
+      where: { [key]: value },
     });
-
-    if (!user) throw new NotFoundException(`User with id ${id} not found`);
-
-    return user;
   }
 
   public async create(user: User): Promise<User> {
@@ -36,7 +35,7 @@ export class DatabaseUserRepository implements UserRepository {
   }
 
   public async delete(id: string): Promise<void> {
-    this.userEntityRepository.delete(id);
+    await this.userEntityRepository.delete(id);
     return;
   }
 }
