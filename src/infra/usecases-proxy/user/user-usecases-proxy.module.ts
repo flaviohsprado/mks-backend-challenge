@@ -17,6 +17,8 @@ import { RepositoriesModule } from '../../repositories/repositories.module';
 import { DatabaseUserRepository } from '../../repositories/user.repository';
 import { ExceptionsModule } from '../../exceptions/exceptions.module';
 import { ExceptionsService } from '../../exceptions/exceptions.service';
+import { CacheConfigModule } from '../../config/redis/cache.module';
+import { CacheService } from '../../config/redis/cache.service';
 
 @Module({
   imports: [
@@ -25,6 +27,7 @@ import { ExceptionsService } from '../../exceptions/exceptions.service';
     RepositoriesModule,
     BcryptModule,
     ExceptionsModule,
+    CacheConfigModule,
   ],
 })
 export class UserUsecasesProxyModule {
@@ -40,31 +43,44 @@ export class UserUsecasesProxyModule {
       module: UserUsecasesProxyModule,
       providers: [
         {
-          inject: [DatabaseUserRepository],
+          inject: [DatabaseUserRepository, CacheService],
           provide: UserUsecasesProxyModule.GET_USERS_USECASES_PROXY,
-          useFactory: (repository: DatabaseUserRepository) =>
-            new UseCaseProxy(new FindAllUserUseCase(repository)),
+          useFactory: (
+            repository: DatabaseUserRepository,
+            cacheService: CacheService,
+          ) =>
+            new UseCaseProxy(new FindAllUserUseCase(repository, cacheService)),
         },
         {
-          inject: [DatabaseUserRepository],
+          inject: [DatabaseUserRepository, ExceptionsService, CacheService],
           provide: UserUsecasesProxyModule.GET_USER_USECASES_PROXY,
           useFactory: (
             repository: DatabaseUserRepository,
             exceptionService: ExceptionsService,
+            cacheService: CacheService,
           ) =>
             new UseCaseProxy(
-              new FindOneUserUseCase(repository, exceptionService),
+              new FindOneUserUseCase(
+                repository,
+                exceptionService,
+                cacheService,
+              ),
             ),
         },
         {
-          inject: [DatabaseUserRepository],
+          inject: [DatabaseUserRepository, ExceptionsService, CacheService],
           provide: UserUsecasesProxyModule.FIND_USER_BY_KEY_USECASES_PROXY,
           useFactory: (
             repository: DatabaseUserRepository,
             exceptionService: ExceptionsService,
+            cacheService: CacheService,
           ) =>
             new UseCaseProxy(
-              new FindUserByKeyUseCase(repository, exceptionService),
+              new FindUserByKeyUseCase(
+                repository,
+                exceptionService,
+                cacheService,
+              ),
             ),
         },
         {
