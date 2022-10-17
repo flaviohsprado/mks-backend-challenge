@@ -1,4 +1,4 @@
-import { NestResponse } from './../../../domain/core/http/nestResponse';
+import { NestResponse } from '../../../main/core/http/nestResponse';
 import {
   CallHandler,
   ExecutionContext,
